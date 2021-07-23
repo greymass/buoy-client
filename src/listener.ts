@@ -102,6 +102,9 @@ export class Listener extends EventEmitter {
                 this.socket = undefined
                 this.emit('disconnect')
             }
+            socket.addEventListener('ping', (event) => {
+                this.emit('ping', event)
+            })
             this.socket = socket
         }
         connect()
