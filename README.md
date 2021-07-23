@@ -15,7 +15,38 @@ npm install --save @greymass/buoy
 
 ## Usage
 
-TODO
+### Send a message.
+
+```ts
+import {send} from '@greymass/buoy'
+
+await send('hello', {service: 'https://cb.anchor.link', channel: 'my-unique-channel-id'})
+```
+
+### Receive a message.
+
+```ts
+import {receive} from '@greymass/buoy'
+
+const message = await receive({service: 'https://cb.anchor.link', channel: 'my-unique-channel-id'})
+```
+
+### Listen for a continuous stream of messages.
+
+```ts
+import {Listener} from '@greymass/buoy'
+
+const listener = new Listener({service: 'https://cb.anchor.link', channel: 'my-unique-channel-id'})
+
+listener.on('message', (message) => {
+    console.log('message', message)
+})
+
+// make sure to subscribe to the error event or they will be thrown
+listener.on('error', (error) => {
+    console.warn('listener error', error)
+})
+```
 
 ## Developing
 
