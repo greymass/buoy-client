@@ -52,6 +52,7 @@ export class Listener extends EventEmitter {
         if (this.active) return
         this.active = true
         let retries = 0
+        let pingTimer: any
         const connect = () => {
             const socket = new this.WebSocket(this.url)
             socket.onmessage = (event) => {
@@ -100,7 +101,19 @@ export class Listener extends EventEmitter {
                     this.timer = setTimeout(connect, backoff(retries++))
                 }
                 this.socket = undefined
+                clearTimeout(pingTimer)
                 this.emit('disconnect')
+            }
+            // fix problem where node.js does not react to the socket going down
+            // this terminates the connection if we don't get a heartbeat in 15s (buoy-nodejs sends every 10s)
+            const nodeSocket = socket as any
+            if (typeof nodeSocket.on === 'function' && typeof nodeSocket.terminate === 'function') {
+                nodeSocket.on('ping', () => {
+                    clearTimeout(pingTimer)
+                    pingTimer = setTimeout(() => {
+                        nodeSocket.terminate()
+                    }, 15 * 1000)
+                })
             }
             this.socket = socket
         }
