@@ -104,6 +104,9 @@ export class Listener extends EventEmitter {
                 }
                 this.socket = undefined
                 clearTimeout(pingTimer)
+                if (this.reconnectTimer) {
+                    clearInterval(this.reconnectTimer)
+                }
                 this.emit('disconnect')
             }
 
@@ -166,7 +169,7 @@ export class Listener extends EventEmitter {
     }
 
     private setupReconnectionTimer() {
-        setInterval(() => {
+        this.reconnectTimer = setInterval(() => {
             this.socket?.close(1000)
         }, 10 * 60 * 1000)
     }
