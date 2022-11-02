@@ -28,6 +28,7 @@ export class Listener extends EventEmitter {
     private active = false
     private socket?: WebSocket
     private timer?: any
+    private reconnectTimer?: any
     private encoding: ListenerEncoding
     private WebSocket: typeof WebSocket
 
@@ -53,6 +54,7 @@ export class Listener extends EventEmitter {
         this.active = true
         let retries = 0
         let pingTimer: any
+
         const connect = () => {
             const socket = new this.WebSocket(this.url)
             socket.onmessage = (event) => {
@@ -102,8 +104,14 @@ export class Listener extends EventEmitter {
                 }
                 this.socket = undefined
                 clearTimeout(pingTimer)
+                if (this.reconnectTimer) {
+                    clearInterval(this.reconnectTimer)
+                }
                 this.emit('disconnect')
             }
+
+            // Reconnect every 10 mins to keep the connection alive
+            this.setupReconnectionTimer()
             // fix problem where node.js does not react to the socket going down
             // this terminates the connection if we don't get a heartbeat in 15s (buoy-nodejs sends every 10s)
             const nodeSocket = socket as any
@@ -158,6 +166,12 @@ export class Listener extends EventEmitter {
             }
         }
         this.emit('message', message)
+    }
+
+    private setupReconnectionTimer() {
+        this.reconnectTimer = setInterval(() => {
+            this.socket?.close(1000)
+        }, 10 * 60 * 1000)
     }
 }
 
