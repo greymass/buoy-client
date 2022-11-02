@@ -1,7 +1,7 @@
 {
     "name": "@greymass/buoy",
     "description": "Client for buoy message forwarder",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "homepage": "https://github.com/greymass/buoy-client",
     "license": "BSD-3-Clause",
     "main": "lib/buoy-client.js",
