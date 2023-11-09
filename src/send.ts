@@ -1,6 +1,6 @@
 import type {Options} from './options'
 
-const global = globalThis || window
+const globalBuoy = globalThis || window
 
 /** Options for the [[send]] method. */
 interface SendOptions extends Options {
@@ -36,7 +36,7 @@ export type SendData = string | Uint8Array | JSONValue
  * @throws if the message can't be delivered if [[SendOptions.requireDelivery]] is set.
  */
 export async function send(message: SendData, options: SendOptions): Promise<SendResult> {
-    const fetch = options.fetch || global.fetch
+    const fetch = options.fetch || globalBuoy.fetch
     const baseUrl = options.service.replace(/^ws/, 'http').replace(/\/$/, '')
     const url = `${baseUrl}/${options.channel}`
 
