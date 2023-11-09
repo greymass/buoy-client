@@ -3,7 +3,7 @@ import EventEmitter from 'eventemitter3'
 import type {Options} from './options'
 import {MessageError, SocketError} from './errors'
 
-const global = globalThis || window
+const globalBuoy = globalThis || window
 
 export enum ListenerEncoding {
     binary = 'binary',
@@ -43,7 +43,7 @@ export class Listener extends EventEmitter {
         const baseUrl = options.service.replace(/^http/, 'ws').replace(/\/$/, '')
         this.url = `${baseUrl}/${options.channel}?v=2`
         this.encoding = options.encoding || ListenerEncoding.text
-        this.WebSocket = options.WebSocket || global.WebSocket
+        this.WebSocket = options.WebSocket || globalBuoy.WebSocket
         if (options.autoConnect !== false) {
             this.connect()
         }
@@ -70,12 +70,12 @@ export class Listener extends EventEmitter {
                 } else if (typeof event.data === 'string') {
                     this.handleMessage(new TextEncoder().encode(event.data))
                 } else if (
-                    typeof global.Buffer !== 'undefined' &&
-                    (event.data instanceof global.Buffer || Array.isArray(event.data))
+                    typeof globalBuoy.Buffer !== 'undefined' &&
+                    (event.data instanceof globalBuoy.Buffer || Array.isArray(event.data))
                 ) {
                     let buffer = event.data
-                    if (!global.Buffer.isBuffer(buffer)) {
-                        buffer = global.Buffer.concat(buffer)
+                    if (!globalBuoy.Buffer.isBuffer(buffer)) {
+                        buffer = globalBuoy.Buffer.concat(buffer)
                     }
                     this.handleMessage(
                         new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength)
